@@ -18,7 +18,7 @@ scene.background = new THREE.Color( 0xf0f0f0 );
 var camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 var objects = [];
 
-var renderer = new THREE.WebGLRenderer();
+var renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
@@ -34,11 +34,18 @@ function init() {
 
 	scene.add(light);
 
-	var geometry = new THREE.BoxGeometry( 2, 4, 0.25 );
+	var geometry = new THREE.BoxGeometry( 2, 4.3, 0.1 );
+
 	//var geometry = new THREE.SphereGeometry( 40, 40, 40 );
 
 	for (var i = 0; i < 1; i++) {
-		var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+		var object = new THREE.Mesh(
+		geometry,
+		new THREE.MeshBasicMaterial({
+				 map: THREE.ImageUtils.loadTexture('model/iPhone.png')
+			})
+
+		);
 
 		object.position.y = 0;
 		object.position.x = 0;
@@ -47,25 +54,44 @@ function init() {
 		object.castShadow = true;
 		object.receiveShadow = true;
 
-					let loader = new THREE.GLTFLoader();
-					loader.load('model/CHAHIN_BOTTLE_OF_SODA.gltf', function(gltf){
-						//gltf.scene.castShadow = true;
-						//gltf.scene.receiveShadow = true;
-						console.warn(gltf.scene.position.y);
-						console.warn(gltf.scene.rotation.x);
-						gltf.scene.position.z = 0;
-						var myVar = setInterval(myTimer, 50);
-						function myTimer() {
-  						var d = new Date();
-							gltf.scene.rotation.y = gltf.scene.rotation.y + 0.1;
-						}
+		let loader = new THREE.GLTFLoader();
+		loader.load('model/CHAHIN_BOTTLE_OF_SODA.gltf', function(gltf){
+		//gltf.scene.castShadow = true;
+		//gltf.scene.receiveShadow = true;
+		gltf.scene.position.z = 0;
+		gltf.scene.rotation.x = 0.3;
+		var myVar = setInterval(myTimer, 50);
+		function myTimer() {
+  			var d = new Date();
+				gltf.scene.rotation.y = gltf.scene.rotation.y + 0.1;
+				if (object.position.y > 0) {
+						console.warn("up");
+				} else if (object.position.y < 0) {
+						console.warn("down");
+				}
+			}
+		 var draggbleTimer = setInterval(dTimer, 1000);
+		function dTimer() {
+		var draggbleTimerFirst = setInterval(dTimerFirst, 50);
+		function dTimerFirst(){
+		//object.position.x = object.position.x + 1;
+		//object.rotation.y = object.rotation.y + 1;
+		}
+		clearInterval(dTimerFirst);
+				//object.position.x = 0;
+		}
 
-						scene.add( gltf.scene );
+		scene.add( gltf.scene );
 
-						//gltf.scene.push( object );
+		grid = new THREE.GridHelper(100, 30, 0x000000, 0x000000);
+		grid.position.y = -2;
+		grid.rotation.y = -2;
+		grid.rotation.x = 0.2;
+		scene.add(grid);
 
 
-					});
+		});
+
 		scene.add( object );
 
 		objects.push( object );
